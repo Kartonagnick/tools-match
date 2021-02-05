@@ -6,10 +6,9 @@
 #endif
 
 #ifdef _MSC_VER
-    #pragma message("pch -> enabled")
-
-    #include <sqlitedb/confbuild.hpp>
-    #pragma message("tools/match(test): " dFULL_VERSION)
+    #include <tools/match/confbuild.hpp>
+    #pragma message("[test] tools/match: pch -> enabled")
+    #pragma message("[test] tools/match: " dFULL_VERSION)
 
     #ifdef STABLE_RELEASE
         #pragma message("Build stable release version")
