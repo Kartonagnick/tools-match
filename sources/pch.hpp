@@ -1,0 +1,18 @@
+
+#pragma once
+
+#ifdef _MSC_VER
+    #pragma message("pch -> enabled")
+    #include <sqlitedb/confbuild.hpp>
+    #pragma message("tools/match: " dFULL_VERSION)
+
+    #ifdef STABLE_RELEASE
+        #pragma message("Build stable release version")
+    #else
+        #pragma message("Build development version")
+    #endif
+#endif
+
+
+
+

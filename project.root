@@ -1,0 +1,12 @@
+﻿
+# --- поддерживаемые конфигурации
+INCLUDE_CONFIGURATIONS = 
+
+# --- игнорируемые конфигурации
+EXCLUDE_CONFIGURATIONS = 
+
+# --- версия продукта
+#VERSION = 1.2.3   
+VERSION = include/tools/match/confbuild.hpp
+
+
