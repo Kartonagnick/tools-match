@@ -1,4 +1,6 @@
 
+// [2021-02-05] Idrisov Denis R.
+// [2021-02-05] birthday of the project
 #pragma once
 
 #ifdef _MSC_VER

@@ -1,12 +1,18 @@
 
-// [2021-02-05] Idrisov Denis R.
+// [2021-02-07] Idrisov Denis R.
 #pragma once
-#ifndef dTOOLS_MATCH_DETAILS_USED_
-#define dTOOLS_MATCH_DETAILS_USED_ 1
+#ifndef dTOOLS_ASSERT_USED_
+#define dTOOLS_ASSERT_USED_ 100
 //==============================================================================
 //==============================================================================
-// #include <tools/stringed/mini.hpp>
+
+#ifdef NDEBUG
+    #define dASSERT(...)
+#else
+    #include <cassert>
+    #define dASSERT(...) assert(__VA_ARGS__)
+#endif
 
 //==============================================================================
 //==============================================================================
-#endif //!dTOOLS_MATCH_DETAILS_USED_
+#endif // !dTOOLS_ASSERT_USED_

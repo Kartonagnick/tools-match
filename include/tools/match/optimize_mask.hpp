@@ -1,4 +1,5 @@
 
+// [2021-02-05] Idrisov Denis R.
 #pragma once
 
 #ifndef dTOOLS_MATCH_OPTIMIZE_MASK_USED_ 
@@ -112,7 +113,7 @@ namespace tools
 
 } // namespace tools
 //==============================================================================
-
+//==============================================================================
 #endif // !dTOOLS_MATCH_OPTIMIZE_MASK_USED_
 
 

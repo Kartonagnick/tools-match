@@ -1,4 +1,5 @@
 
+// [2021-02-05] Idrisov Denis R.
 #pragma once
 
 #ifndef dTOOLS_MATCH_REGEX_USED_ 
@@ -127,7 +128,7 @@ namespace tools
 } // namespace tools
 
 //==============================================================================
-
+//==============================================================================
 #endif // !dTOOLS_MATCH_REGEX_USED_
 
 
