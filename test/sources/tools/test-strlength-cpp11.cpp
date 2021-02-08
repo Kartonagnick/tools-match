@@ -38,10 +38,13 @@ namespace test_stringed_strlength
     constexpr const std::nullptr_t cnil = nullptr;
     constexpr std::nullptr_t nil = nullptr;
 
+    #if !defined(_MSC_VER) || _MSC_VER >= 1910
+    //#pragma message("build for msvc2017 (or newer) or other compiler")
     static_assert(me::strlength(meow_a) == 4             , "error(1): expected 'true'"  );
     static_assert(me::strlength(meow_w) == 4             , "error(2): expected 'true'"  );
     static_assert(me::strlength(std::move(meow_a)) == 4  , "error(3): expected 'true'"  );
     static_assert(me::strlength(std::move(meow_w)) == 4  , "error(4): expected 'true'"  );
+    #endif
 
     static_assert(me::strlength(  "meow") == 4           , "error(5): expected 'true'"  );
     static_assert(me::strlength( L"meow") == 4           , "error(6): expected 'true'"  );
@@ -103,6 +106,7 @@ namespace test_stringed_strlength
 		ASSERT_DEATH_DEBUG(len = me::strlength(std::move(val )));
 		ASSERT_DEATH_DEBUG(len = me::strlength(std::move(ref )));
 		ASSERT_DEATH_DEBUG(len = me::strlength(std::move(rval)));
+		(void) len;
     }
 
     #define dINITIALIZE(initial)                        \

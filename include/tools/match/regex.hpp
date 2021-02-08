@@ -3,7 +3,7 @@
 #pragma once
 
 #ifndef dTOOLS_MATCH_REGEX_USED_ 
-#define dTOOLS_MATCH_REGEX_USED_ 1
+#define dTOOLS_MATCH_REGEX_USED_ 100
 
 #include <cassert>
 #include <string>

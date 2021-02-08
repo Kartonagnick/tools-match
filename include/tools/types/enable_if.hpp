@@ -4,8 +4,8 @@
 //==============================================================================
 //==============================================================================
 #pragma once
-#ifndef dTOOLS_TYPES_ENABLE_IF_USED_
-#define dTOOLS_TYPES_ENABLE_IF_USED_ 100
+#ifndef dTOOLS_ENABLE_IF_USED_
+#define dTOOLS_ENABLE_IF_USED_ 100
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1900) || __cplusplus >= 201103L
     // #pragma message("build for msvc2015 (or newer)")
@@ -31,4 +31,4 @@ namespace tools
 
 //==============================================================================
 //==============================================================================
-#endif // !dTOOLS_TYPES_ENABLE_IF_USED_
+#endif // !dTOOLS_ENABLE_IF_USED_

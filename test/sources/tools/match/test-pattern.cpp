@@ -1,4 +1,5 @@
 ﻿
+// [2021-02-05] Idrisov Denis R.
 #include <mygtest/modern.hpp>
 
 #ifdef TEST_TOOLS_MATCH_PATTERN
@@ -12,66 +13,80 @@ namespace me = ::tools;
 //================================================================================
 namespace
 {
-    const char* bool2string(const bool value) noexcept
+    const char* bool2string(const bool value) dNOEXCEPT
     {
         return value? "true" : "false";
     }
 
     template<class s1, class s2>
-    void check(s1&& text, s2&& mask, const bool expected)
+    void check(const s1& text, const s2& mask, const bool expected)
     {
-        const auto result
-            = me::match_pattern(text, mask);
-
+        const bool result = me::match_pattern(text, mask);
         ASSERT_TRUE(expected == result) 
             << "me::match_pattern(" << text << ", " << mask << ") "
             << "returned '"  << bool2string(result)   << "', "
             << "expected: '" << bool2string(expected) << "'\n"
         ;
     }
-}
+
+    void check_joker(const char* once_value)
+    {
+        ASSERT_TRUE( me::match_pattern(once_value, "*"  ));
+        ASSERT_TRUE( me::match_pattern(once_value, "**" ));
+        ASSERT_TRUE(!me::match_pattern(once_value, "*.*"));
+    }
+
+} // namespace
 //================================================================================
 
+#ifndef NDEBUG
 // --- match_pattern(nullptr, mask)
 TEST_COMPONENT(000)
 {
+    bool re = false;
     ASSERT_DEATH_DEBUG(
-        const char* const text = nullptr; 
-        me::match_pattern(text, "*")
+        const char* const text = NULL; 
+        re = me::match_pattern(text, "*")
     );
     ASSERT_DEATH_DEBUG(
-        const wchar_t* const text = nullptr; 
-        me::match_pattern(text, L"*")
+        const wchar_t* const text = NULL; 
+        re = me::match_pattern(text, L"*")
     );
+	(void) re;
 }
 
 // --- match_pattern(mask, nullptr)
 TEST_COMPONENT(001)
 {
+    bool re = false;
     ASSERT_DEATH_DEBUG(
-        const char* const mask = nullptr; 
-        me::match_pattern("text", mask)
+        const char* const mask = NULL; 
+        re = me::match_pattern("text", mask)
     );
     ASSERT_DEATH_DEBUG(
-        const wchar_t* const mask = nullptr; 
-        me::match_pattern(L"text", mask)
+        const wchar_t* const mask = NULL; 
+        re = me::match_pattern(L"text", mask)
     );
+    (void) re;	
 }
 
 // --- match_pattern(nullptr, nullptr)
 TEST_COMPONENT(002)
 {
+    bool re = false;
     ASSERT_DEATH_DEBUG(
-        const char* const text = nullptr; 
-        const char* const mask = nullptr; 
-        me::match_pattern(text, mask)
+        const char* const text = NULL; 
+        const char* const mask = NULL; 
+        re = me::match_pattern(text, mask)
     );
     ASSERT_DEATH_DEBUG(
-        const wchar_t* const text = nullptr; 
-        const wchar_t* const mask = nullptr; 
-        me::match_pattern(text, mask)
+        const wchar_t* const text = NULL; 
+        const wchar_t* const mask = NULL; 
+        re = me::match_pattern(text, mask)
     );
+    (void) re;	
 }
+#endif // !!NDEBUG
 
 // --- typical usage
 TEST_COMPONENT(003)
@@ -144,16 +159,31 @@ TEST_COMPONENT(006)
     // ? - once any character
     // * - any charaters
 
-    check(""              , R"raw(??-22*)raw", false);
-    check("-22"           , R"raw(??-22*)raw", false);
-    check("A-22"          , R"raw(??-22*)raw", false);
-    check("QQ-22"         , R"raw(??-22*)raw", true );
-    check("ZZ-22"         , R"raw(??-22*)raw", true );
-    check("QQQ-22"        , R"raw(??-22*)raw", false);
-    check("TT-22M"        , R"raw(??-22*)raw", true );
-    check("TT-22M3"       , R"raw(??-22*)raw", true );
-    check("Q-22-TT-22M3"  , R"raw(??-22*)raw", false);
-    check("QQ-22-TT-22M3" , R"raw(??-22*)raw", true );
+    // danger of trigraph
+    #ifdef dHAS_CPP11
+        check(""              , R"raw(??-22*)raw", false);
+        check("-22"           , R"raw(??-22*)raw", false);
+        check("A-22"          , R"raw(??-22*)raw", false);
+        check("QQ-22"         , R"raw(??-22*)raw", true );
+        check("ZZ-22"         , R"raw(??-22*)raw", true );
+        check("QQQ-22"        , R"raw(??-22*)raw", false);
+        check("TT-22M"        , R"raw(??-22*)raw", true );
+        check("TT-22M3"       , R"raw(??-22*)raw", true );
+        check("Q-22-TT-22M3"  , R"raw(??-22*)raw", false);
+        check("QQ-22-TT-22M3" , R"raw(??-22*)raw", true );
+    #else
+        const std::string mask = "??" + std::string("-22*");
+        check(""              , mask, false);
+        check("-22"           , mask, false);
+        check("A-22"          , mask, false);
+        check("QQ-22"         , mask, true );
+        check("ZZ-22"         , mask, true );
+        check("QQQ-22"        , mask, false);
+        check("TT-22M"        , mask, true );
+        check("TT-22M3"       , mask, true );
+        check("Q-22-TT-22M3"  , mask, false);
+        check("QQ-22-TT-22M3" , mask, true );
+    #endif // dHAS_CPP11
 }
 
 // --- different variants [3]
@@ -186,17 +216,17 @@ TEST_COMPONENT(008)
 // --- stress-test [1]
 TEST_COMPONENT(009)
 {
-    const auto* mask
+    const char* mask
         = "12345hell*12345hello*123hello";
 
     // --- маска не совпадет из-за последнего символа
-    const auto* val1 
+    const char* val1 
         = "12345hello111112345hello123helld";
     check(val1, mask, false); 
 
     // --- теперь к этой же строке 
     // добавляем подходящие по маске символы
-    const auto* val2 
+    const char* val2 
         = "12345hello111112345hello123hello";
     check(val2, mask, true); 
 }
@@ -204,10 +234,10 @@ TEST_COMPONENT(009)
 // --- stress-test [2]
 TEST_COMPONENT(010)
 {
-    const auto* mask
+    const char* mask
         = "12345hell*12345hello";
 
-    const auto* val
+    const char* val
         = "12345hell 12345helld12345hello";
     check(val, mask, true); 
 }
@@ -215,10 +245,10 @@ TEST_COMPONENT(010)
 // --- stress-test [3]
 TEST_COMPONENT(011)
 {
-    const auto* mask 
+    const char* mask 
         = "12345hell*12345hello*123hello";
 
-    const auto* val 
+    const char* val 
         = "12345hello111112345hello123helld";
     check(val, mask, false); 
 }
@@ -226,10 +256,10 @@ TEST_COMPONENT(011)
 // --- stress-test [4]
 TEST_COMPONENT(012)
 {
-    const auto* mask
+    const char* mask
         = "12345hell*12345hello*123hello";
 
-    const auto* val 
+    const char* val 
         = "12345hello111112345hello123hello";
     check(val, mask, true); 
 }
@@ -237,10 +267,10 @@ TEST_COMPONENT(012)
 // --- stress-test [5]
 TEST_COMPONENT(013)
 {
-    const auto* mask 
+    const char* mask 
         = "12345hell*12345hello*123hello";
 
-    const auto* val 
+    const char* val 
         = "12345hello111112345hello123helld12345hello";
     check(val, mask, false); 
 }
@@ -248,10 +278,10 @@ TEST_COMPONENT(013)
 // --- stress-test [6]
 TEST_COMPONENT(014)
 {
-    const auto* mask
+    const char* mask
         = "12345hell*12345hello*123hello";
 
-    const auto* val 
+    const char* val 
         = "12345hello111112345hello12345helld12345hello12345hello";
     check(val, mask, false); 
 }
@@ -259,10 +289,10 @@ TEST_COMPONENT(014)
 // --- stress-test [7]
 TEST_COMPONENT(015)
 {
-    const auto* mask
+    const char* mask
         = "*aabb*ccc*cccc*xxxx*aa";
 
-    const auto* val 
+    const char* val 
         = "qqaabbccccXwwwwdddccccRsssSccccRxxxx*aaa";
     check(val, mask, true); 
 }
@@ -270,12 +300,6 @@ TEST_COMPONENT(015)
 // --- "*" or "**" or "*.*"
 TEST_COMPONENT(016)
 {
-    const auto check_joker = [](const char* once_value)
-    {
-        ASSERT_TRUE( me::match_pattern(once_value, "*"  ));
-        ASSERT_TRUE( me::match_pattern(once_value, "**" ));
-        ASSERT_TRUE(!me::match_pattern(once_value, "*.*"));
-    };
     check_joker( ""   );
     check_joker( "A"  );
     check_joker( "ABC");
@@ -369,23 +393,23 @@ TEST_COMPONENT(018)
 
 TEST_COMPONENT(019)
 {
-    const auto* val  = "text11aa";
-    const auto* mask = "text??*";
+    const char* val  = "text11aa";
+    const char* mask = "text??*";
     const bool success = me::match_pattern(val, mask);
     ASSERT_TRUE(success);
 }
 
 TEST_COMPONENT(020)
 {
-    const auto* val = "text1";
-    const auto* mask = "text??*";
+    const char* val = "text1";
+    const char* mask = "text??*";
     const bool success = me::match_pattern(val, mask);
     ASSERT_TRUE(!success);
 }
 
 TEST_COMPONENT(021)
 {
-    const auto* mask = "text??*";
+    const char* mask = "text??*";
 
     const bool success 
         = me::match_pattern(std::string("text1"), mask);

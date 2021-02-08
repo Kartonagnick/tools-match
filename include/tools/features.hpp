@@ -5,6 +5,15 @@
 #define dTOOLS_FEATURES_USED_ 100
 
 //==============================================================================
+//=== dMESSAGE =================================================================
+
+#ifdef _MSC_VER
+    #define dMESSAGE(...)  __pragma(message(__VA_ARGS__))
+#else
+    #define dMESSAGE(...) 
+#endif
+
+//==============================================================================
 //=== dHAS_CPP11 ===============================================================
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1900) || __cplusplus >= 201103L
@@ -83,6 +92,7 @@
     // #pragma message("build for c++14 (or newer)")
     #define dCONSTEXPR_CPP14 constexpr
     #define dHAS_CONSTEXPR_CPP14
+    #define dHAS_CPP14
 #else
     #define dCONSTEXPR_CPP14 inline
 #endif
@@ -100,7 +110,7 @@
 
 #if (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L
     // #pragma message("build for c++17 (or newer))
-    #define dCPP17
+    #define dHAS_CPP17
     #define dNODISCARD [[nodiscard]]
 #else
     #define dNODISCARD

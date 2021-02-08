@@ -5,7 +5,8 @@
 #ifdef TEST_TOOLS_STRINGED_CONCEPT
 
 #include <tools/features.hpp>
-#ifdef dHAS_CPP11
+#if defined (dHAS_CPP11) && (!defined(_MSC_VER) || _MSC_VER >= 1910)
+// #pragma message("build for msvc2017 (or newer) or other compiler")
 
 #define dTEST_COMPONENT tools, stringed
 #define dTEST_METHOD concept
@@ -171,5 +172,5 @@ TEST_COMPONENT(004)
 
 //==============================================================================
 //==============================================================================
-#endif // !dHAS_CPP11
+#endif // defined (dHAS_CPP11) && (!defined(_MSC_VER) || _MSC_VER > 1900)
 #endif // !TEST_TOOLS_STRINGED_CONCEPT

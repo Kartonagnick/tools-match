@@ -14,7 +14,7 @@
 #define dTOOLS_IF_USED_
 namespace tools 
 {
-    template <bool, class ret> struct if_;
+    template <bool, class ret = void> struct if_;
     template <class ret> struct if_<true, ret>
         { typedef ret type; };
 

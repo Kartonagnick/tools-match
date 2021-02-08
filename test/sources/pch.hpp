@@ -2,18 +2,12 @@
 // [2021-02-05] Idrisov Denis R.
 // [2021-02-05] birthday of the project
 #pragma once
+//================================================================================
+//================================================================================
 
-#ifndef WIN32_LEAN_AND_MEAN
+#if defined(_MSC_VER) && !defined(WIN32_LEAN_AND_MEAN)
     #define WIN32_LEAN_AND_MEAN
 #endif
-
-#ifdef _MSC_VER
-    #define dMESSAGE(...)  __pragma(message(__VA_ARGS__))
-#else
-    #define dMESSAGE(...) 
-#endif
-
-//#include <tools/features.hpp>
 
 #if !defined(_MSC_VER) || _MSC_VER > 1900
     //#pragma message("build for msvc2017 (or newer) or gcc-like compiler")
@@ -58,17 +52,28 @@
 //================================================================================
 
 #include <mygtest/pch_used.hpp>
+#include <mygtest/main.hpp>
 
 //================================================================================
 //================================================================================
 
-#ifdef NDEBUG
-    #define dASSERT(...)
-#else
-    #include <cassert>
-    #define dASSERT(...) assert(__VA_ARGS__)
-#endif
+#include <iterator>
+#include <cassert>
+#include <cstddef>
 
-//================================================================================
-//================================================================================
+#include <tools/features.hpp>
+#include <tools/assert.hpp>
+#include <tools/valid.hpp>
+#include <tools/strlength.hpp>
 
+//==============================================================================
+//==============================================================================
+
+#include <stdexcept>
+#include <cassert>
+#include <string>
+#include <vector>
+#include <list>
+
+//==============================================================================
+//==============================================================================

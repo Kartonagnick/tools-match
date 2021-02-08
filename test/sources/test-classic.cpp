@@ -9,8 +9,10 @@
 #define TEST_CASE_NAME tools
 #define TEST_NUMBER(n) classic_##n
 
-namespace tools {} // namespace tools 
+#include <stdexcept>
+#include <cassert>
 
+namespace tools {} // namespace tools 
 namespace me = ::TEST_CASE_NAME;
 //==============================================================================
 //=== TDD ======================================================================
@@ -31,8 +33,7 @@ namespace
     void foo()
     {
         assert(false);
-
-        std::cout << "INVALID\n";
+        dprint(std::cerr << "INVALID\n");
         throw ::std::runtime_error("test");
     }
   

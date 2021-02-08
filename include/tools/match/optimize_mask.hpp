@@ -3,7 +3,7 @@
 #pragma once
 
 #ifndef dTOOLS_MATCH_OPTIMIZE_MASK_USED_ 
-#define dTOOLS_MATCH_OPTIMIZE_MASK_USED_ 1
+#define dTOOLS_MATCH_OPTIMIZE_MASK_USED_ 100
 
 #include <tools/match/details.hpp>
 
@@ -13,11 +13,11 @@ namespace tools
 {
     // return new length
     template<class ch> 
-    size_t optimize_mask(ch* const mask, const size_t len) noexcept;
+    dNODISCARD size_t optimize_mask(ch* const mask, const size_t len) dNOEXCEPT;
 
     // return new length
     template<class str> 
-    size_t optimize_mask(str& mask) noexcept;
+    dNODISCARD size_t optimize_mask(str& mask) dNOEXCEPT;
 
 } // namespace tools
 //==============================================================================
@@ -31,9 +31,9 @@ namespace tools
 {
     // return new length
     template<class ch> 
-    size_t optimize_mask(ch* const mask, const size_t len) noexcept
+    dNODISCARD size_t optimize_mask(ch* const mask, const size_t len) dNOEXCEPT
     {
-        assert(mask);
+        dASSERT(mask);
 
         if(len == 0)
             return 0;
@@ -71,14 +71,14 @@ namespace tools
             mask[i] = '\0';
             ++t;
         }
-        assert(len > delta);
+        dASSERT(len > delta);
         return len - delta;
     }
 
     namespace detail
     {
-        template<class s, dSTRING_CONSEPT(s)> 
-        size_t optimize_mask(s&& mask) noexcept 
+        template<class s> 
+        size_t optimize_mask(s& mask) dNOEXCEPT 
         {
             const size_t len
                 = ::tools::optimize_mask(&mask[0], mask.length());
@@ -87,27 +87,48 @@ namespace tools
         }
 
         template<class s>
-        auto optimize_mask(s&& mask)
-        dPOINTER_OR_ARRAY_CONSEPT(mask, size_t)
+        size_t optimize_mask_pointer(s* mask) dNOEXCEPT
         {
-            assert(::tools::valid_(mask));
-            const size_t len = ::tools::length_(mask);
+            assert(mask);
+            const size_t len = ::tools::strlength(mask);
             return ::tools::optimize_mask(&mask[0], len);
         }
+
+        template<class s>
+        size_t optimize_mask(s*& p) dNOEXCEPT 
+            { return optimize_mask_pointer(p); }
+
+        template<class s> 
+        size_t optimize_mask(s* const& p) dNOEXCEPT 
+            { return optimize_mask_pointer(p); }
+
+        template<class s> 
+        size_t optimize_mask(s* volatile& p) dNOEXCEPT 
+            { return optimize_mask_pointer(p); }
+
+        template<class s> 
+        size_t optimize_mask(s* volatile const& p) dNOEXCEPT 
+            { return optimize_mask_pointer(p); }
+
+        template<class ch, size_t n> 
+        size_t optimize_mask(ch (&arr)[n]) dNOEXCEPT 
+            { return optimize_mask_pointer(arr); }
 
     } // namespace detail
 
     // return new length
     template<class str> 
-    size_t optimize_mask(str& mask) noexcept
+    dNODISCARD size_t optimize_mask(str& mask) dNOEXCEPT
     {
-        assert(::tools::valid_(mask));
-        using x = ::std::remove_reference_t<str>;
-        using z = ::std::remove_pointer_t<x>;
-        static_assert(
-            !::std::is_const<z>::value,
-            "expected non-const object"
-        );
+        dASSERT(::tools::valid(mask));
+        #ifdef dHAS_CPP11
+            using x = ::std::remove_reference_t<str>;
+            using z = ::std::remove_pointer_t<x>;
+            static_assert(
+                !::std::is_const<z>::value,
+                "expected non-const object"
+            );
+        #endif
         return ::tools::detail::optimize_mask(mask);
     }
 

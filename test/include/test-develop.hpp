@@ -28,12 +28,13 @@
 //===== tools/stringed =====================================||==================
     // need c++11
     #define TEST_TOOLS_STRINGED_CONCEPT                     // ready!
-    #define TEST_TOOLS_STRINGED_STRLEN                      // in progress...
+    #define TEST_TOOLS_STRINGED_STRLEN                      // ready!
 
 //===== tools/match ========================================||==================
-    // #define TEST_TOOLS_MATCH_GROUP                       // ready!
-    // #define TEST_TOOLS_MATH_OPTIMIZE_MASK                // ready!
-    // #define TEST_TOOLS_MATCH_PATTERN                     // ready!
+    // support pre11 and c++11
+    #define TEST_TOOLS_MATCH_GROUP                          // ready!
+    #define TEST_TOOLS_MATCH_OPTIMIZE_MASK                  // ready!
+    #define TEST_TOOLS_MATCH_PATTERN                        // ready!
 
 //==============================================================================
 //==============================================================================

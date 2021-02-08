@@ -23,10 +23,6 @@ namespace staff
     typedef ::std::wstring str_w;
     typedef ::std::basic_string<int> str_i;
 
-//    using str_t = ::std::string;
-//    using str_w = ::std::wstring;
-//    using str_i = ::std::basic_string<int>;
-
     template<class t> t* maket_pointer(const t*)                dNOEXCEPT;
     template<class t> t* maket_pointer(const t* const)          dNOEXCEPT;
     template<class t> t* maket_pointer(const t* volatile)       dNOEXCEPT;

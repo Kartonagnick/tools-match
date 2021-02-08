@@ -1,8 +1,11 @@
 
+// [2021-02-05] Idrisov Denis R.
 #pragma once
 
 #ifndef dTOOLS_MATCH_GROUP_
-#define dTOOLS_MATCH_GROUP_ 1
+#define dTOOLS_MATCH_GROUP_ 100
+//==============================================================================
+//==============================================================================
 
 #include <tools/match/details.hpp>
 
@@ -13,7 +16,8 @@ namespace tools
     // assert(!me::match_group(""      , "mask"));
 
     template<class str1, class str2>
-    bool match_group(const str1& symbol, const str2& mask) noexcept;
+    dNODISCARD 
+    bool match_group(const str1& symbol, const str2& mask) dNOEXCEPT;
 
 } // namespace tools
 
@@ -21,19 +25,19 @@ namespace tools
 //==============================================================================
 namespace tools
 {
-    namespace detail
+    namespace detail_match_group
     {
         template<class ch> 
-        bool check_template(ch* expr, const ch* group) noexcept
+        bool check_template(ch* expr, const ch* group) dNOEXCEPT
         {
-            assert(expr);
-            assert(group);
+            dASSERT(expr);
+            dASSERT(group);
 
             if (!expr || !group) 
                 return false;
 
-            ch *mask     = nullptr;
-            ch *mask_ast = nullptr;
+            ch *mask     = 0;
+            ch *mask_ast = 0;
             bool ast     = false;
 
             //--- skip multiple '!'
@@ -111,11 +115,11 @@ namespace tools
         }
     
         template<class ch>
-        bool match_group(const ch* symbol, const ch* masks) noexcept
+        bool match_group(const ch* symbol, const ch* masks) dNOEXCEPT
         {
-            assert(symbol);
-            assert(masks);
-            assert(*symbol != ' ');
+            dASSERT(symbol);
+            dASSERT(masks);
+            dASSERT(*symbol != ' ');
 
             //--- check
             if (!masks || !symbol) 
@@ -146,7 +150,7 @@ namespace tools
                 mask[pos] = 0;
 
                 //--- check
-                const bool ok = detail::check_template(mask, symbol);
+                const bool ok = detail_match_group::check_template(mask, symbol);
                 if (mask[0] == '!' && ok)
                     return false;
                 else if(ok)
@@ -160,35 +164,42 @@ namespace tools
             return found;
         }
 
-    } // namespace detail
+        #ifndef NDEBUG // debug
+        template<class ch> 
+        void check_symbol(ch* symbol, const size_t len) dNOEXCEPT
+        {
+            assert(symbol);
+            const ch* front = &symbol[0];
+            const ch* back = front + len - 1;
+            assert(*front != ' ');
+            assert(*back  != ' ');
+        }
+        #endif // !!NDEBUG
+
+    } // namespace detail_match_group
 
 //==============================================================================
 //==============================================================================
 
     template<class str1, class str2>
-    bool match_group(const str1& symbol, const str2& mask) noexcept
+    dNODISCARD
+    bool match_group(const str1& symbol, const str2& mask) dNOEXCEPT
     {
-        #ifndef NDEBUG
-            // debug
-            namespace x = ::tools;
-            const auto len_symbol = x::length_(symbol);
-            const auto len_mask   = x::length_(mask);
-            assert(len_symbol < 255);
-            assert(len_mask   < 255);
-
+        namespace x = detail_match_group;
+        #ifndef NDEBUG // debug
+            const size_t len_symbol = ::tools::strlength(symbol);
+            const size_t len_mask   = ::tools::strlength(mask);
+            dASSERT(len_symbol < 255);
+            dASSERT(len_mask   < 255);
             if(len_symbol != 0)
-            {
-                const auto* front = &symbol[0];
-                const auto* back = front + len_symbol - 1;
-                assert(*front != ' ');
-                assert(*back  != ' ');
-            }
+                x::check_symbol(&symbol[0], len_symbol);
         #endif
 
-        return detail::match_group(&symbol[0], &mask[0]);
+        return x::match_group(&symbol[0], &mask[0]);
     }
 
-#if 0
+    #if 0
+    // --- todo
     template<class s1, class s2>
     bool match_group(const s1& symbol, const s2& security, const str_t& mask) noexcept
     {
@@ -207,10 +218,11 @@ namespace tools
         }
         return false;
     }
-#endif
+    #endif
 
 } // namespace tools
 
-
+//==============================================================================
+//==============================================================================
 #endif // !dTOOLS_MATCH_GROUP_
 

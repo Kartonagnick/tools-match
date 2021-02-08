@@ -2,32 +2,22 @@
 // [2021-02-05] Idrisov Denis R.
 #pragma once
 
-#ifndef dTOOLS_MATCH_PATTERN_USED_ 
-#define dTOOLS_MATCH_PATTERN_USED_ 1
+#ifndef dTOOLS_MATCH_PATTERN_CONT_USED_ 
+#define dTOOLS_MATCH_PATTERN_CONT_USED_ 100
 
-#include <cassert>
-#include <type_traits>
-
-//#include <tools/stringed/stringed.hpp>
-//#include <tools/stringed/basic.hpp>
+#include <tools/match/details.hpp>
+#include <iterator>
 
 //==============================================================================
 //=== declaration ==============================================================
 namespace tools
 {
-    template<class s1, class s2>
-        bool match_pattern(const s1& text, const s2& pattern) noexcept;
-
     template<class s1, class s2, class container>
-        bool match_pattern(const s1& text, const s2& pattern, container& dst);
-
-    // return new length
-    template<class ch> 
-        size_t optimize_mask(ch* const mask, const size_t len) noexcept;
-
-    // return new length
-    template<class str> 
-        size_t optimize_mask(str& mask);
+    dNODISCARD bool match_pattern(
+        const s1& text,
+        const s2& mask, 
+        container& dst
+    );
 
 } // namespace tools
 //==============================================================================
@@ -35,112 +25,153 @@ namespace tools
 
 
 
-//=== match_pattern(const s1& text, const s2& pattern) =========================
+
+
+//==============================================================================
+//=== implementation ===========================================================
 namespace tools
 {
-    namespace detail
+    namespace detail_pattern
     {
-        template<class ch>
-        bool match_pattern(const ch* s, const ch* p) noexcept
+        template<class ch>  
+        size_t offset(const ch* const last, const ch* const start) 
         {
-            assert(s);
-            assert(p);
-
-            const ch* rs = nullptr;
-            const ch* rp = nullptr;
-
-            while (true)
-                if (*p == '*')
-                    rs = s,
-                    rp = ++p;
-                else if (!*s)
-                    return !*p;
-                else if (*s == *p || *p == '?')
-                    ++s, 
-                    ++p;
-                else if (rs)
-                    s = ++rs, 
-                    p = rp;
-                else
-                    return false;
-        }
-
-    }//namespace detail
-
-    template<class s1, class s2>
-    bool match_pattern(const s1& text, const s2& pattern) noexcept
-    {
-        return detail::match_pattern(&text[0], &pattern[0]);
-#if 0
-        namespace me = ::tools;
-        //drequired_compatible(s1, text, s2, pattern);
-        return detail::match_pattern(
-            me::c_str(text), 
-            me::c_str(pattern)
-        );
-#endif
-    }
-
-} // namespace tools
-
-
-//=== container& destination: implementation ===================================
-namespace tools
-{
-    namespace detail
-    {
-        template<class ch>
-        size_t offset(ch* const& last, ch* const& start) noexcept
-        {
-            assert(last >= start);
+            dASSERT(last >= start);
             return static_cast<size_t>(last - start);
         }
 
         template<class container>
         class has_operator_asccess
         {
-            template <class type> static 
-                ::std::true_type check(
-                    ::std::add_pointer_t<decltype(::std::declval<type>()[0])>
-                );
+            typedef char (&no )[1]; 
+            typedef char (&yes)[2];
 
-            template <class c> static 
-                ::std::false_type check(...);
+            typedef container x;
+            typedef typename x::value_type 
+                elem;
+
+            typedef const elem& (x::* sig)(const size_t) const;
+
+            template<class, sig> struct help {}; // <-- must be complete (bug with msvc2013)
+
+            #if 0   
+            bug with msvc2013:
+
+            c:\program files (x86)\microsoft visual studio 12.0\vc\include\xmemory0(572): 
+            fatal error C1001: An internal error has occurred in the compiler.
+            2>  (compiler file 'msc1.cpp', line 1325)
+            #endif
+
+            template<class> static no check(...);
+
+            template<class u> static 
+                yes check(help< u, &u::operator[] >* p);
+
+            enum { result = sizeof(check<x>(0)) };
         public:
-            has_operator_asccess() = delete;
-           ~has_operator_asccess() = delete;
-
-            using type 
-                = decltype(check<container>(nullptr));
-
-            enum { value = type::value };
+            has_operator_asccess(){};
+            enum { value = result != sizeof(no) };
         };
 
-        // --- ::std::vector::operator[]
-        // --- update iterator after realoc
-        template<class container, class ch>
-        ::std::enable_if_t< has_operator_asccess<container>::value >
-        add_value_(
-            container& dst, const ch* const s, 
-            typename container::const_iterator& iter
-        )
+        #ifdef dHAS_CPP17
+        template<class container> 
+        class has_operator_asccess_noexcept
         {
-            const auto v = ::std::distance(dst.cbegin(), iter);
-            dst.emplace_back(s, 1);
-            iter = dst.cbegin() + v;
-        }
-      
-        // --- ::std::list
-        // --- does not need to be updated iterator
-        template<class container, class ch>
-        ::std::enable_if_t< !has_operator_asccess<container>::value >
-        add_value_(container& dst, const ch* const s, 
-            typename container::const_iterator& iter
-        )
+            typedef char (&no )[1]; 
+            typedef char (&yes)[2];
+
+            typedef container x;
+            typedef typename x::value_type 
+                elem;
+
+            typedef const elem& (x::* sig)(const size_t) const noexcept;
+
+            template<class, sig> struct help; 
+
+            template<class> static no check(...);
+            template<class u> static 
+                yes check(help<u, &u::operator[] >* p);
+
+            enum { result = sizeof(check<x>(0)) };
+        public:
+            has_operator_asccess_noexcept() = delete;
+            enum { value = result != sizeof(no) };
+        };
+        #endif // !dHAS_CPP17
+
+        #ifdef dHAS_CPP17
+
+            #define dIS_VECTOR_                                  \
+                has_operator_asccess<container>::value ||        \
+                has_operator_asccess_noexcept<container>::value  \
+
+        #else
+
+            #define dIS_VECTOR_ \
+                has_operator_asccess<container>::value
+
+        #endif // dHAS_CPP17
+
+        template<class container, bool = dIS_VECTOR_>
+            struct agent;
+
+        #undef dIS_VECTOR_
+
+        template<class cont> struct agent <cont, true>
         {
-            dst.emplace_back(s, 1);
-            (void) iter;
-        }
+            typedef typename cont::value_type
+                str_type;
+            typedef typename str_type::value_type
+                ch;
+            typedef typename cont::const_iterator
+                iter_t;
+            typedef ::std::iterator_traits<iter_t>
+                traits_t;
+            typedef typename traits_t::difference_type
+                diff_t;
+
+            static void update(cont& dst, const ch* const text, iter_t& iter)
+            {
+                dASSERT(text);
+                const iter_t beg = dst.begin();
+
+                const diff_t v = ::std::distance(beg, iter);
+                dASSERT(v >= 0);
+
+                #ifdef dHAS_CPP11
+                    dst.emplace_back(text, 1);
+                #else
+                    const str_type el;
+                    dst.push_back(el);
+                    str_type& ref = dst.back();
+                    ref += *text;
+                #endif
+                iter = dst.begin() + v;
+            }
+        };
+
+        template<class cont> struct agent <cont, false>
+        {
+            typedef typename cont::value_type
+                str_type;
+            typedef typename str_type::value_type
+                ch;
+            typedef typename cont::const_iterator
+                iter_t;
+
+            static void update(cont& dst, const ch* const text, iter_t&)
+            {
+                dASSERT(text);
+                #ifdef dHAS_CPP11
+                    dst.emplace_back(text, 1);
+                #else
+                    const str_type el;
+                    dst.push_back(el);
+                    str_type& ref = dst.back();
+                    ref += text[0];
+                #endif
+            }
+        };
 
         template<class ch, class container>
         bool match_pattern(
@@ -150,33 +181,44 @@ namespace tools
             const size_t lenmask, 
             container&   dst) 
         {
-            using str_type 
-                = typename container::value_type;
+            typedef typename container::value_type
+                str_type;
+            typedef typename container::const_iterator
+                iter_t;
+            namespace me = ::tools::detail_pattern;
+            typedef me::agent<container>                                
+                agent_t;
 
-            using char_t 
-                = typename str_type::value_type;
-
-            using iter_t 
-                = typename container::const_iterator;
-
+            #ifdef dHAS_CPP11
+            typedef typename str_type::value_type
+                char_t;
+            
             static_assert(
                 !::std::is_const<container>::value,
-                "[ERROR] 'container' can not be const"
+                "'container' can not be const"
             );
-
             static_assert(
                 ::std::is_same<ch, char_t>::value,
-                "symbols are not compatible"
+                "'symbols' are not compatible"
             );
+            #endif
 
-            namespace me = ::tools;
-            
-            assert(text);
-            assert(mask);
-            assert(me::length(text) >= lentext);
-            assert(me::length(mask) >= lenmask);
+            dASSERT(text);
+            dASSERT(mask);
+            dASSERT(::tools::strlength(text) >= lentext);
+            dASSERT(::tools::strlength(mask) >= lenmask);
 
-            if(*text == '\0' && *mask == '\0')
+            #ifdef dHAS_CPP11
+                constexpr const ch null =  0;
+                constexpr const ch star = '*';
+                constexpr const ch qust = '?';
+            #else
+                const ch null =  0;
+                const ch star = '*';
+                const ch qust = '?';
+            #endif
+
+            if(*text == null && *mask == null)
                 return true;
 
             const ch* st  = text;
@@ -184,28 +226,34 @@ namespace tools
             const ch* pst = mask;
             const ch* p   = mask;
 
-            const ch* rs = nullptr;
-            const ch* rp = nullptr;
+            const ch* rs  = NULL;
+            const ch* rp  = NULL;
 
             dst.clear();
 
-            iter_t iter = dst.cend();
+            iter_t iter = dst.end();
             
             size_t curlen = 0;
             bool is_question = false;
             bool is_star     = false;
 
-            while(true)
+            for(;;)
             {
-                const auto dist = offset(p, pst);
-                assert(p && dist <= lenmask);
-                if(dist < lenmask  && *p=='*')
+                const size_t dist = me::offset(p, pst);
+                dASSERT(p && dist <= lenmask);
+                if(dist < lenmask  && *p == star)
                 {
                     rs = s;
                     rp = ++p;
                     if(!is_star)
                     {
-                        dst.emplace_back();
+                        #ifdef dHAS_CPP11
+                            dst.emplace_back();
+                        #else
+                            const str_type empty;
+                            dst.push_back(empty);
+                        #endif
+
                         iter = dst.end();
                         --iter;
                     }
@@ -217,31 +265,31 @@ namespace tools
 
                 if(lentext == curlen)
                 {
-                    const size_t lenmask_ = offset(p, pst);
-                    const auto success = lenmask_ == lenmask;
+                    const bool success
+                        = lenmask == me::offset(p, pst);
                     if(!success)
                         dst.clear();
                     return success;
                 }
 
                 bool next = false;
-                if(*p=='?')
+                if(*p == qust)
                 {
                     if(!is_question)
                     {
                         is_question = true;
-                        add_value_(dst, s, iter);
+                        agent_t::update(dst, s, iter);
                     }
                     else
                     {
                         if(dst.empty())
-                            add_value_(dst, s, iter);
+                            agent_t::update(dst, s, iter);
                         else
                             dst.back() += *s;
                     }
                     next = true;
                 }
-                else if(*s==*p)
+                else if(*s == *p)
                 {
                     is_question = false;
                     next = true;
@@ -249,28 +297,31 @@ namespace tools
 
                 if(next)
                 {
-                    ++s;
-                    ++p;
-                    ++curlen;
+                    ++s; ++p; ++curlen;
                     continue;
                 }
            
                 if(rs)
                 {
-                    assert(!dst.empty());
+                    dASSERT(!dst.empty());
                     is_question = false;
                     str_type actual = *iter;
                     actual += *rs;
-                    dst.erase(iter, dst.cend());
-                    dst.emplace_back(std::move(actual));
+                    dst.erase(iter, dst.end());
 
-                    iter = dst.cend(); 
+                    #ifdef dHAS_CPP11
+                        dst.emplace_back(::std::move(actual));
+                    #else
+                        dst.push_back(actual);
+                    #endif
+
+                    iter = dst.end(); 
                     --iter;
 
                     s = ++rs;
                     p = rp;
 
-                    curlen = s - st;
+                    curlen = static_cast<size_t>(s - st);
                     continue;
                 }
                 else
@@ -281,113 +332,33 @@ namespace tools
             }
         }
 
-    }//namespace detail
+    } // namespace detail_pattern
 
     template<class s1, class s2, class container>
-    bool match_pattern(
-        const s1& text, 
-        const s2& pattern, 
-        container& destination)
+    dNODISCARD bool match_pattern(const s1& text, const s2& mask, container& destination)
     {
-        namespace me = ::tools;
-
-        //namespace me = ::tools::stringed;
-        //drequired_compatible(s1, text, s2, pattern);
-
-        static_assert(
-            ::std::is_const<container>::value == 0,
+        #ifdef dHAS_CPP11
+        static_assert(::std::is_const<container>::value == 0,
             "'container' can not be 'const'"
         );
-        return detail::match_pattern( 
-            me::c_str(text), 
-            me::length(text),
-            me::c_str(pattern),
-            me::length(pattern),
+        #endif
+
+        dASSERT(::tools::valid(text));
+        dASSERT(::tools::valid(mask));
+        const size_t len_text = ::tools::strlength(text);
+        const size_t len_mask = ::tools::strlength(mask);
+        return detail_pattern::match_pattern( 
+            &text[0], len_text,
+            &mask[0], len_mask,
             destination
         );
     }
 
 } // namespace tools
 
-
-//=== optimize_mask: implementation ============================================
-namespace tools
-{
-    // return new length
-    template<class ch> 
-    size_t optimize_mask(ch* const mask, const size_t len) noexcept
-    {
-        assert(mask);
-
-        if(len == 0)
-            return 0;
-
-        size_t delta = 0;
-
-        // --- ищем две идущих подряд звезды
-        size_t i = 0;
-        for(; i != len - 1; ++i)
-        {
-            if(mask[i] == '*' && mask[i + 1] == '*')
-                break;
-        }
-
-        if(i == len - 1)
-            return len;
-
-        // --- сдвигаем влево
-        ++delta;
-        bool star = true;
-        size_t t = (++i);
-        for(++i; i != len; ++i)
-        {
-            if(mask[i] != '*')
-                star = false;
-            else if(star)
-            {
-                ++delta;
-                continue;
-            }
-            else
-                star = true;
-
-            mask[t] = mask[i];
-            mask[i] = '\0';
-            ++t;
-        }
-        assert(len > delta);
-        return len - delta;
-    }
-
-    // return new length
-    template<class str> size_t optimize_mask(str& mask)
-    {
-        namespace me = ::tools::stringed;
-
-        using x = ::std::remove_reference_t<str>;
-        using z = ::std::remove_pointer_t<str>;
-
-        static_assert(
-            !::std::is_const<x>::value,
-            "expected non-const object"
-        );
-        static_assert(
-            !::std::is_const<z>::value,
-            "expected non-const object"
-        );
-
-        const auto new_len = ::tools::optimize_mask(
-            me::str(mask), 
-            me::length(mask)
-        );
-        me::fixed_new_size(mask, new_len);
-        return new_len;
-    }
-
-} // namespace tools
 //==============================================================================
 //==============================================================================
-#endif // !dTOOLS_MATCH_PATTERN_USED_
+#endif // !dTOOLS_MATCH_PATTERN_CONT_USED_
 
 
 

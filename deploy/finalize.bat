@@ -7,24 +7,24 @@ rem =========================================================================
 :main
     setlocal
     set "eGROUP=%~1"
-    if not defined eGROUP exit /b
+
     @echo.
     @echo [FINALIZE] %eGROUP% ^(%eEXPANDED_SUFFIX%)
 
     call :normalizePath eDIR_PRODUCT ^
         "%eDIR_PRODUCT%\%eEXPANDED_SUFFIX%" 
 
-    set "dir_=%~dp0..\_artifacts"
+    set "dir_=%~dp0_artifacts"
     if defined eVERSION (set "dir_=%dir_%\%eVERSION%")
     call :normalizePath eDIR_INSTALL "%dir_%"
 
-    @echo [IN DEVELOPMENT] ...
     @echo [eDIR_PRODUCT] ... %eDIR_PRODUCT%
     @echo [eDIR_INSTALL] ... %eDIR_INSTALL%
 
-    rem if not defined eGROUP ((call :copyIncludes) && (goto :success) || (goto :failed))
-    rem set "eDIR_INSTALL=%eDIR_INSTALL%\%eEXPANDED_SUFFIX%"
-    rem (call :copyLibraries) || (goto :failed)
+    if not defined eGROUP ((call :copyIncludes) && (goto :success) || (goto :failed))
+
+    set "eDIR_INSTALL=%eDIR_INSTALL%\%eEXPANDED_SUFFIX%"
+    (call :copyLibraries) || (goto :failed)
     rem (call :copyModules)   || (goto :failed)
 :success
     @echo [FINALIZE] completed successfully

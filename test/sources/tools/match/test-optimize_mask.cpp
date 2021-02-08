@@ -1,4 +1,5 @@
 
+// [2021-02-05] Idrisov Denis R.
 #include <mygtest/modern.hpp>
 
 #ifdef TEST_TOOLS_MATCH_OPTIMIZE_MASK
@@ -12,13 +13,11 @@ namespace me = ::tools;
 //==============================================================================
 namespace
 {
-    template<class s1, class s2> 
+    template<class ch, class s1, class s2> 
     void optimization(const s1& src_mask, const s2& expect)
     {
-        using x  = decltype(src_mask[0]);
-        using z  = std::remove_reference_t<x>;
-        using ch = std::remove_cv_t<z>;
-        using str_type = std::basic_string<ch>;
+        typedef std::basic_string<ch>
+            str_type;
 
         str_type mask = src_mask;
         const size_t len = me::optimize_mask(mask);
@@ -31,26 +30,31 @@ namespace
     }
 
     #define optimize(mask, expect)  \
-        optimization(mask, expect); \
-        optimization(L##mask, L##expect)
+        optimization<char>(mask, expect); \
+        optimization<wchar_t>(L##mask, L##expect)
     
 } // namespace
 
 //==============================================================================
 
+#ifndef NDEBUG
 // nullptr (death)
 TEST_COMPONENT(000)
 {
+    size_t len = 0;
     ASSERT_DEATH_DEBUG(
-         char* mask = nullptr;
-         me::optimize_mask(mask)
+         char* mask = NULL;
+         len = me::optimize_mask(mask)
     );
 
     ASSERT_DEATH_DEBUG(
-         wchar_t* mask = nullptr;
-         me::optimize_mask(mask)
+         wchar_t* mask = NULL;
+         len = me::optimize_mask(mask)
     );
+	(void) len;
 }
+#endif // !NDEBUG
+
 TEST_COMPONENT(001)
 {
     std::string mask = "1**?a";
@@ -68,7 +72,7 @@ TEST_COMPONENT(002)
     char mask[] = "aaa****bbbb";
     const std::string etalon = "aaa*bbbb";
 
-    const auto len = me::optimize_mask(mask);
+    const size_t len = me::optimize_mask(mask);
     const std::string result(mask, len);
     ASSERT_TRUE(len == etalon.length());
     ASSERT_TRUE(etalon == result);
@@ -79,7 +83,7 @@ TEST_COMPONENT(003)
     char mask[] = "aaa****bbbb***ccc";
     const std::string etalon = "aaa*bbbb*ccc";
 
-    const auto len = me::optimize_mask(mask);
+    const size_t len = me::optimize_mask(mask);
     const std::string result(mask, len);
     ASSERT_TRUE(len == etalon.length());
     ASSERT_TRUE(etalon == result);
@@ -88,7 +92,7 @@ TEST_COMPONENT(004)
 {
     char mask[] = "***";
     const std::string etalon = "*";
-    const auto len = me::optimize_mask(mask);
+    const size_t len = me::optimize_mask(mask);
     const std::string result(mask, len);
     ASSERT_TRUE(len == etalon.length());
     ASSERT_TRUE(etalon == result);
@@ -97,7 +101,7 @@ TEST_COMPONENT(005)
 {
     char mask[] = "";
     const std::string etalon = "";
-    const auto len = me::optimize_mask(mask);
+    const size_t len = me::optimize_mask(mask);
     const std::string result(mask, len);
     ASSERT_TRUE(len == etalon.length());
     ASSERT_TRUE(etalon == result);
@@ -106,7 +110,7 @@ TEST_COMPONENT(006)
 {
     char mask[] = "txt";
     const std::string etalon = "txt";
-    const auto len = me::optimize_mask(mask);
+    const size_t len = me::optimize_mask(mask);
     const std::string result(mask, len);
     ASSERT_TRUE(len == etalon.length());
     ASSERT_TRUE(etalon == result);
@@ -123,8 +127,9 @@ TEST_COMPONENT(007)
 TEST_COMPONENT(008)
 {
     std::string val = "123???***??456";
-    me::optimize_mask(val);
+    const size_t len = me::optimize_mask(val);
     ASSERT_TRUE(val == "123???*??456");
+    ASSERT_TRUE(len == 12);
 }
 
 // --- stress

@@ -48,7 +48,7 @@ namespace test_stringed_strlength
         ASSERT_TRUE(me::strlength(txt) == 0);
         ASSERT_TRUE(me::strlength(ref) == 0);
     }
-
+	#ifndef NDEBUG
     template<class ptr> void pointer()
     {
         ptr val    = 0;
@@ -56,7 +56,9 @@ namespace test_stringed_strlength
         size_t len = 0;
         ASSERT_DEATH_DEBUG(len = me::strlength(val));
         ASSERT_DEATH_DEBUG(len = me::strlength(ref));
+		(void) len;
     }
+	#endif
 
     #define dINITIALIZE(initial)                        \
         enum { size = sizeof(text) / sizeof(text[0]) }; \
