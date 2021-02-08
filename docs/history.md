@@ -8,7 +8,7 @@
     - match/group.hpp  
     - match/pattern.hpp  
     - match/optimize_mask.hpp  
-    - match/regex.hpp (не протестирован) 
+    - match/regex.hpp (не протестирован)  
 
 2) Добавлен служебный для модуля функционал:  
     - assert.hpp  
@@ -20,7 +20,7 @@
 3) Неиспользуемые элементы:  
     - stringed/concept.hpp  
     - stringed/strlen.hpp  
-    - types/enable_if.hpp (не протестирован) 
+    - types/enable_if.hpp (не протестирован)  
 
 Могут быть удалены из данного модуля, за ненадобностью.  
 
