@@ -1,21 +1,26 @@
 
-#include <mygtest/test-list.hpp>
+// [2021-02-05] Idrisov Denis R.
+#include <mygtest/modern.hpp>
 //==============================================================================
 //==============================================================================
 
-#ifdef TEST_CLASSIC
+#ifdef TEST_MODERN
 
-#define TEST_CASE_NAME tools
-#define TEST_NUMBER(n) classic_##n
+#define dTEST_COMPONENT example, additional
+#define dTEST_METHOD method
+#define dTEST_TAG tdd
 
-namespace tools {} // namespace tools 
+#define TEST_CASE_NAME old_example
+#define TEST_NUMBER(n) old_method_##n
 
-namespace me = ::TEST_CASE_NAME;
+#include <cassert>
+#include <stdexcept>
+
 //==============================================================================
-//=== TDD ======================================================================
+//==============================================================================
 namespace
 {
-    template <class callable> 
+    template <class callable>
     void death_test(callable& call)
     {
         #ifdef NDEBUG
@@ -31,7 +36,7 @@ namespace
     {
         assert(false);
 
-        std::cout << "INVALID\n";
+        dprint(std::cerr << "INVALID\n");
         throw ::std::runtime_error("test");
     }
   
@@ -43,11 +48,16 @@ TEST(TEST_CASE_NAME, TEST_NUMBER(000))
 {
     ASSERT_DEATH_DEBUG(foo());
 }
-
 TEST(TEST_CASE_NAME, TEST_NUMBER(001))
 {
     death_test(foo);
 }
+
+dREGISTER_UNIT_TEST(SampleTest_Method, tools\\ololo\\SampleTest, Method)
+{
+    dprint(std::cout << "ok\n");
+}
+
 TEST_COMPONENT(002)
 {
     ASSERT_DEATH_DEBUG(foo());
@@ -62,6 +72,13 @@ _TEST_COMPONENT(004)
     // --- check compile
 }
 
-#endif // !TEST_CLASSIC
+TEST_COMPONENT(005)
+{
+    #ifdef _VARIADIC_MAX
+        dprint(std::cout << "macro: " << _VARIADIC_MAX << '\n');
+    #endif
+}
 
-
+//==============================================================================
+//==============================================================================
+#endif // ! TEST_MODERN

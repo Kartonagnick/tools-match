@@ -1,9 +1,11 @@
 
+// [2021-02-05] Idrisov Denis R.
+// [2021-02-05] birthday of the project
 #pragma once
 
 #ifdef _MSC_VER
-    #pragma message("pch -> enabled")
-    #include <sqlitedb/confbuild.hpp>
+    #include <tools/match/confbuild.hpp>
+    #pragma message("tools/match: pch -> enabled")
     #pragma message("tools/match: " dFULL_VERSION)
 
     #ifdef STABLE_RELEASE
@@ -13,6 +15,17 @@
     #endif
 #endif
 
+//==============================================================================
+//==============================================================================
 
+#include <iterator>
+#include <cassert>
+#include <cstddef>
 
+#include <tools/features.hpp>
+#include <tools/assert.hpp>
+#include <tools/valid.hpp>
+#include <tools/strlength.hpp>
 
+//==============================================================================
+//==============================================================================

@@ -4,8 +4,23 @@
 **Версия 1.0.0 (предварительная)**  
 ----------------------------------
 
-1) Нужно дописать.  
+1) Добавлен следующий функционал:  
+    - match/group.hpp  
+    - match/pattern.hpp  
+    - match/optimize_mask.hpp  
+    - match/regex.hpp (не протестирован)  
 
+2) Добавлен служебный для модуля функционал:  
+    - assert.hpp  
+    - features.hpp  
+    - strlength.hpp  
+    - strlength.hpp  
+    - valid.hpp  
 
+3) Неиспользуемые элементы:  
+    - stringed/concept.hpp  
+    - stringed/strlen.hpp  
+    - types/enable_if.hpp (не протестирован)  
 
+Могут быть удалены из данного модуля, за ненадобностью.  
 
