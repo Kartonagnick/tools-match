@@ -1,5 +1,5 @@
 
-// [2021-02-05] Idrisov Denis R.
+// [2021y-02m-05d] Idrisov Denis R.
 #pragma once
 #ifndef dTOOLS_FEATURES_USED_
 #define dTOOLS_FEATURES_USED_ 100
@@ -19,7 +19,11 @@
 #if (defined(_MSC_VER) && _MSC_VER >= 1900) || __cplusplus >= 201103L
     // #pragma message("build for msvc2015 (or newer) or other compiler")
     // #pragma message("build for c++11 (or newer)")
-    #define dHAS_CPP11
+    #define dHAS_CPP11 1
+    #define dHAS_CONSTEXPR_CPP11 1
+    #define dCONSTEXPR_CPP11 constexpr
+#else 
+    #define dCONSTEXPR_CPP11 inline
 #endif
 
 #ifdef dHAS_CPP11
@@ -33,7 +37,9 @@
 #if (defined(_MSC_VER) && _MSC_VER >= 1800) || __cplusplus >= 201103L
     // #pragma message("build for msvc2013 (or newer) or other compiler")
     // #pragma message("build for c++11 (or newer)")
+    #define dHAS_TEMPLATE_FUNCTION_DEFAULT_PARAM 1
     #define dHAS_DELETING_FUNCTIONS 1
+    #define dHAS_USING_ALIAS 1
 #endif
 
 #ifdef dHAS_DELETING_FUNCTIONS
@@ -66,22 +72,10 @@
     #define dHAS_NOEXCEPT 1
 #endif
                 
-#if defined(dHAS_NOEXCEPT)
+#ifdef dHAS_NOEXCEPT
     #define dNOEXCEPT noexcept
 #else
     #define dNOEXCEPT throw()
-#endif
-
-//==============================================================================
-//=== dCONSTEXPR_CPP11 =========================================================
-
-#if (defined(_MSC_VER) && _MSC_VER >= 1900) || __cplusplus >= 201103L
-    // #pragma message("build for msvc2015 (or newer) or other compiler")
-    // #pragma message("build for c++11 (or newer)")
-    #define dCONSTEXPR_CPP11 constexpr
-    #define dHAS_CONSTEXPR_CPP11
-#else
-    #define dCONSTEXPR_CPP11 inline
 #endif
 
 //==============================================================================
@@ -91,8 +85,8 @@
     // #pragma message("build for msvc2017 (or newer) or other compiler")
     // #pragma message("build for c++14 (or newer)")
     #define dCONSTEXPR_CPP14 constexpr
-    #define dHAS_CONSTEXPR_CPP14
-    #define dHAS_CPP14
+    #define dHAS_CONSTEXPR_CPP14 1
+    #define dHAS_CPP14 1
 #else
     #define dCONSTEXPR_CPP14 inline
 #endif
@@ -102,7 +96,7 @@
 
 #if !defined(_MSC_VER) || _MSC_VER > 1900
     //#pragma message("build for msvc2017 (or newer) or gcc-like compiler")
-    #define dHAS_RVALUE_ARRAY
+    #define dHAS_RVALUE_ARRAY 1
 #endif
 
 //==============================================================================
@@ -110,7 +104,7 @@
 
 #if (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L
     // #pragma message("build for c++17 (or newer))
-    #define dHAS_CPP17
+    #define dHAS_CPP17 1
     #define dNODISCARD [[nodiscard]]
 #else
     #define dNODISCARD
@@ -122,8 +116,3 @@
 
 // trailing-syntaxis-for-auto (since C++11)
 // example: auto foo() -> int
-
-// alias template (since C++11)
-// example:
-//   template<class ch>
-//       using str_t = std::string<ch>

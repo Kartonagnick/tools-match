@@ -1,5 +1,5 @@
 
-// [2021-02-08] Idrisov Denis R.
+// [2021y-02m-08d] Idrisov Denis R.
 #pragma once
 #ifndef dTOOLS_STRLENGTH_USED_
 #define dTOOLS_STRLENGTH_USED_ 100
