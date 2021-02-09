@@ -1,5 +1,5 @@
 
-// [2021-02-05] Idrisov Denis R.
+// [2021y-02m-05d] Idrisov Denis R.
 #include <mygtest/modern.hpp>
 
 #ifdef TEST_TOOLS_STRINGED_CONCEPT
@@ -20,7 +20,6 @@
 #else
     dMESSAGE("[test] tools/stringed/concept: disabled -> dHAS_RVALUE_ARRAY")
 #endif
-dMESSAGE("[test] tools/stringed/concept: volatile std::string -> not support")
 
 using namespace staff;
 //==============================================================================

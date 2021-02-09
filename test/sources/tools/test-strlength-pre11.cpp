@@ -1,5 +1,5 @@
 
-// [2021-02-08] Idrisov Denis R.
+// [2021y-02m-08d] Idrisov Denis R.
 #include <mygtest/modern.hpp>
 //==============================================================================
 //==============================================================================
@@ -18,7 +18,6 @@
 #else
     dMESSAGE("[test][until c++11] tools/strlength.hpp: disabled -> dHAS_RVALUE_ARRAY")
 #endif
-dMESSAGE("[test][until c++11] tools/strlength.hpp: volatile std::string -> not support")
 
 namespace me = ::tools;
 using namespace staff;

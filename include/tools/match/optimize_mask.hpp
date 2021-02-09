@@ -1,5 +1,5 @@
 
-// [2021-02-05] Idrisov Denis R.
+// [2021y-02m-05d] Idrisov Denis R.
 #pragma once
 
 #ifndef dTOOLS_MATCH_OPTIMIZE_MASK_USED_ 

@@ -9,8 +9,7 @@ rem ============================================================================
     setlocal
     @echo [RUN] QtCreator ...
 
-    set "eDEBUG=ON"
-
+    rem set "eDEBUG=ON"
     call "%eDIR_BAT_ENGINE%\run.bat" ^
         "--runIDE: QtCreator"
 

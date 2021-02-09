@@ -7,10 +7,10 @@
 #ifndef dTOOLS_ENABLE_IF_USED_
 #define dTOOLS_ENABLE_IF_USED_ 100
 
-#if (defined(_MSC_VER) && _MSC_VER >= 1900) || __cplusplus >= 201103L
-    // #pragma message("build for msvc2015 (or newer)")
+#if (defined(_MSC_VER) && _MSC_VER >= 1800) || __cplusplus >= 201103L
+    // #pragma message("build for msvc2013 (or newer)")
     // #pragma message("build for c++11 (or newer)")
-    #define dHAS_CPP11
+    #define dHAS_USING_ALIAS 1
 #endif
 
 namespace tools
@@ -21,7 +21,7 @@ namespace tools
     template <class t> struct enable_if<true, t>
         { typedef t type; };
 
-    #ifdef dHAS_CPP11
+    #ifdef dHAS_USING_ALIAS
         template <bool ok, class t = void>
         using enable_if_t
             = typename enable_if<ok, t>::type;
