@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Workspace
+CMakeLists.txt.user
+_artifacts

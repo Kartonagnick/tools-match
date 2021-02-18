@@ -18,32 +18,32 @@ namespace me = ::tools;
 
 TEST_COMPONENT(000)
 {
-    const auto ok 
+    const bool ok 
         = me::match_group("EURUSD", "+EURUSD, !EUR*");
     ASSERT_TRUE(ok);
 }
 TEST_COMPONENT(001)
 {
-    const auto ok 
+    const bool ok 
         = me::match_group("EURUSD", "+EURUSD, !EUR*, *");
     ASSERT_TRUE(ok);
 }
 TEST_COMPONENT(002)
 {
-    const auto ok 
+    const bool ok 
         = me::match_group("AUDCAD", "+EURUSD, !EUR*, *");
     ASSERT_TRUE(ok);
 }
 TEST_COMPONENT(003)
 {
-    const auto ok 
+    const bool ok 
         = me::match_group("EURCAD", "+EURUSD, !EUR*, *");
     ASSERT_TRUE(!ok);
 }
 
 TEST_COMPONENT(004)
 {
-    const auto ok 
+    const bool ok 
         = me::match_group("EURUSD", "!EUR*, +EURUSD");
     ASSERT_TRUE(!ok);
 }
