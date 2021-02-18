@@ -1,24 +1,58 @@
 ﻿
 // [2021y-02m-05d] Idrisov Denis R.
-#include <mygtest/test-list.hpp>
+#include <mygtest/modern.hpp>
 
-#ifdef TEST_TOOLS_MATCH_GROUP
+#ifdef TEST_TOOLS_MATCH_GROUP_PLUS
 
 #include <tools/match/group.hpp>
 
-#define TEST_CASE_NAME tools
-#define TEST_NUMBER(n) match_group_plus##n
 
-namespace me = ::TEST_CASE_NAME;
+#define dTEST_COMPONENT tools
+#define dTEST_METHOD match_group
+#define dTEST_TAG plus
+
+namespace me = ::tools;
 //==============================================================================
-namespace {} // namespace
 
 //==============================================================================
 
 TEST_COMPONENT(000)
 {
-    //const auto ok = me::match_group("cy-a", "sv-*, *-a-*, *-a, a-*");
-    //ASSERT_TRUE(ok);
+    const auto ok 
+        = me::match_group("EURUSD", "+EURUSD, !EUR*");
+    ASSERT_TRUE(ok);
+}
+TEST_COMPONENT(001)
+{
+    const auto ok 
+        = me::match_group("EURUSD", "+EURUSD, !EUR*, *");
+    ASSERT_TRUE(ok);
+}
+TEST_COMPONENT(002)
+{
+    const auto ok 
+        = me::match_group("AUDCAD", "+EURUSD, !EUR*, *");
+    ASSERT_TRUE(ok);
+}
+TEST_COMPONENT(003)
+{
+    const auto ok 
+        = me::match_group("EURCAD", "+EURUSD, !EUR*, *");
+    ASSERT_TRUE(!ok);
+}
+
+TEST_COMPONENT(004)
+{
+    const auto ok 
+        = me::match_group("EURUSD", "!EUR*, +EURUSD");
+    ASSERT_TRUE(!ok);
+}
+
+_TEST_COMPONENT(005)
+{
+    bool ok = false;
+    ASSERT_DEATH_DEBUG(ok = me::match_group("EURUSD", "!+EURUSD"));
+    (void)ok;
 }
 
 

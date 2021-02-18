@@ -40,9 +40,9 @@ namespace tools
             ch *mask_ast = 0;
             bool ast     = false;
 
-            //--- skip multiple '!'
-            for (mask = expr; *mask == '!'; ++mask)
-                { /*nothing*/ }
+            for (mask = expr; *mask == '!'; ++mask) {}
+            while (*mask == '+')
+                ++mask;
 
             //--- check for '*' at start
             for (; *mask && *mask == '*'; ++mask)
@@ -151,7 +151,11 @@ namespace tools
 
                 //--- check
                 const bool ok = detail_match_group::check_template(mask, symbol);
-                if (mask[0] == '!' && ok)
+
+                if (mask[0] == '+' && ok)
+                    return true;
+
+                else if (mask[0] == '!' && ok)
                     return false;
                 else if(ok)
                     found = true;
