@@ -1,5 +1,5 @@
 
-# 2021y-01m-22d. WorkSpace project.
+# 2021y-02m-12d. WorkSpace project.
 ################################################################################
 ################################################################################
 
@@ -17,12 +17,13 @@ project(${gNAME_PROJECT})
 #--- tools-match
 make_target()
 
-#--- automatically link with 'mygetst', 'gmock', or 'gtest' 
-#--- depending on which libraries are available
 make_target(
     PATH_TO_SOURCES "test"
 #    INCLUDES "${gDIR_SOURCE}/include"
-    DEPENDENCIES "tools-match" 
+#    DEPENDENCIES "tools-match" 
+
+    #--- automatically link with 'mygtest', 'gmock', or 'gtest' 
+    #--- depending on which libraries are available
 )
 
 ################################################################################

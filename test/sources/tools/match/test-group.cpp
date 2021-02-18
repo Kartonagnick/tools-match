@@ -232,6 +232,13 @@ TEST_COMPONENT(026)
     ASSERT_TRUE(!me::match_group("", "Forex"));
 }
 
+TEST_COMPONENT(027)
+{
+    const auto ok = me::match_group("cy-a", "sv-*, *-a-*, *-a, a-*");
+    ASSERT_TRUE(ok);
+}
+
+
 #endif // !TEST_TOOLS_MATCH_GROUP
 
 

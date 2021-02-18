@@ -11,6 +11,7 @@
 
 #include <stdexcept>
 #include <cassert>
+#include <string>
 
 namespace tools {} // namespace tools 
 namespace me = ::TEST_CASE_NAME;
@@ -40,6 +41,12 @@ namespace
 }//namespace
 //==============================================================================
 //==============================================================================
+
+TEST_COMPONENT(000x)
+{
+    const size_t l = std::char_traits<char>::length("123");
+    ASSERT_TRUE(l == 3);
+}
 
 TEST(TEST_CASE_NAME, TEST_NUMBER(000))
 {
