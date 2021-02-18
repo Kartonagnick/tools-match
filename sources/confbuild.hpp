@@ -1,8 +1,6 @@
 
 // [2021y-02m-05d] Idrisov Denis R.
 #pragma once
-#ifndef dTOOLS_MATCH_CONFBUILD_USED_
-#define dTOOLS_MATCH_CONFBUILD_USED_ 100
 //==============================================================================
 //==============================================================================
 
@@ -41,8 +39,8 @@
 #endif
 
 #define dVERSION_MAJOR      1
-#define dVERSION_MINOR      0
-#define dVERSION_PATCH      1 
+#define dVERSION_MINOR      1
+#define dVERSION_PATCH      0 
 
 #define dSTRINGIZE(...) #__VA_ARGS__
 #define dSSTRINGIZE(x) dSTRINGIZE(x)
@@ -58,4 +56,3 @@
 
 //==============================================================================
 //==============================================================================
-#endif // !dTOOLS_MATCH_CONFBUILD_USED_

@@ -17,24 +17,25 @@
 
 //==============================================================================
 //===== modern/classic =====================================||==================
-    #define TEST_MODERN                                     // ready!
-    #define TEST_CLASSIC                                    // ready!
+    // #define TEST_MODERN                                  // ready!
+    // #define TEST_CLASSIC                                 // ready!
 
 //===== tools/match ========== (pre11) (c++11) =============||==================
-    #define TEST_TOOLS_MATCH_GROUP                          // ready!
-    #define TEST_TOOLS_MATCH_OPTIMIZE_MASK                  // ready!
-    #define TEST_TOOLS_MATCH_PATTERN                        // ready!
+    #define TEST_TOOLS_MATCH_GROUP_PLUS                     // ready!
+    // #define TEST_TOOLS_MATCH_GROUP                       // ready!
+    // #define TEST_TOOLS_MATCH_OPTIMIZE_MASK               // ready!
+    // #define TEST_TOOLS_MATCH_PATTERN                     // ready!
 
 //===== tools/types ========== (pre11) (c++11) =============||==================
-    #define TEST_TOOLS_ENABLE_IF                            // ready!
+    // #define TEST_TOOLS_ENABLE_IF                         // ready!
 
 //===== tools/stringed =============== (c++11) =============||==================
-    #define TEST_TOOLS_STRINGED_CONCEPT                     // ready!
-    #define TEST_TOOLS_STRINGED_STRLEN                      // ready!
+    // #define TEST_TOOLS_STRINGED_CONCEPT                  // ready!
+    // #define TEST_TOOLS_STRINGED_STRLEN                   // ready!
 
 //===== tools ================ (pre11) (c++11) =============||==================
-    #define TEST_TOOLS_VALID                                // ready! 
-    #define TEST_TOOLS_STRLENGTH                            // ready! 
+    // #define TEST_TOOLS_VALID                             // ready! 
+    // #define TEST_TOOLS_STRLENGTH                         // ready! 
 
 //==============================================================================
 //==============================================================================

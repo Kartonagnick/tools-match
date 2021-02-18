@@ -234,7 +234,8 @@ TEST_COMPONENT(026)
 
 TEST_COMPONENT(027)
 {
-    const auto ok = me::match_group("cy-a", "sv-*, *-a-*, *-a, a-*");
+    const auto ok
+        = me::match_group("cy-a", "sv-*, *-a-*, *-a, a-*");
     ASSERT_TRUE(ok);
 }
 
