@@ -6,7 +6,6 @@ INCLUDE_CONFIGURATIONS =
 EXCLUDE_CONFIGURATIONS = 
 
 # --- версия продукта
-#VERSION = 1.2.3   
 VERSION = sources/confbuild.hpp
 
 

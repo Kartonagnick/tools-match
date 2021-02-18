@@ -2,7 +2,7 @@
 // [2021y-02m-05d] Idrisov Denis R.
 #pragma once
 #ifndef dTOOLS_FEATURES_USED_
-#define dTOOLS_FEATURES_USED_ 100
+#define dTOOLS_FEATURES_USED_ 101
 
 //==============================================================================
 //=== dMESSAGE =================================================================
@@ -13,6 +13,14 @@
     #define dMESSAGE(...) 
 #endif
 
+//==============================================================================
+//=== dHAS_RVALUE_REFERENCES ===================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1700
+    // #pragma message("build for msvc2010 (or newer) or other compiler")
+    #define dHAS_RVALUE_REFERENCES 1
+#endif
+    
 //==============================================================================
 //=== dHAS_CPP11 ===============================================================
 
@@ -27,7 +35,6 @@
 #endif
 
 #ifdef dHAS_CPP11
-    #include <cstddef>
     using nullptr_t = decltype(nullptr);
 #endif
 
