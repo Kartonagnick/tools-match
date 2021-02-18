@@ -28,7 +28,7 @@ namespace tools
     namespace detail_match_group
     {
         template<class ch> 
-        bool check_template(ch* expr, const ch* group) dNOEXCEPT
+        bool check_template(const ch* expr, const ch* group) dNOEXCEPT
         {
             dASSERT(expr);
             dASSERT(group);
@@ -36,13 +36,15 @@ namespace tools
             if (!expr || !group) 
                 return false;
 
-            ch *mask     = 0;
-            ch *mask_ast = 0;
-            bool ast     = false;
+            const ch *mask_ast = 0;
+            const ch *mask = expr;
+            bool ast = false;
 
-            for (mask = expr; *mask == '!'; ++mask) {}
-            while (*mask == '+')
+            while (*mask == '+' || *mask == '!')
+            {
+                assert(false && "check_template: unexpected characters");
                 ++mask;
+            }
 
             //--- check for '*' at start
             for (; *mask && *mask == '*'; ++mask)
@@ -74,25 +76,25 @@ namespace tools
                     }
 
                 //--- check group
-                if (!*mask && !*group) 
+                if (*mask == 0 && *group == 0) 
                     return true;
 
-                if (!*mask) 
+                if (*mask == 0) 
                 {
                     if (!ast) 
                         return false;
                     else 
                         mask = mask_ast; 
                 }
-                if (!*group)
+                if (*group == 0)
                 {
                     if (*mask && *mask != '*') 
                         return false; 
                     else 
                     {
-                        for (; *mask && *mask == '*'; ++mask) 
-                            { /* nothing */ }
-                        if (!*mask) 
+                        while (*mask == '*')
+                            ++mask;
+                        if (*mask == 0) 
                             return true;
                         return false;
                     }
@@ -102,7 +104,7 @@ namespace tools
                     for (; *mask && *mask == '*'; ++mask)
                         mask_ast = mask;
                 
-                    if (!*mask) 
+                    if (*mask == 0) 
                         return true;
                     ast = true;
                     --group;
@@ -114,33 +116,37 @@ namespace tools
             return true;
         }
     
+        enum eRESULT { eMATCHED, eNO_MATCHED, eBANNED };
+
         template<class ch>
-        bool match_group(const ch* symbol, const ch* masks) dNOEXCEPT
+        eRESULT match_group(const ch* symbol, const ch* masks) dNOEXCEPT
         {
+            namespace x = ::tools::detail_match_group;
+
             dASSERT(symbol);
             dASSERT(masks);
             dASSERT(*symbol != ' ');
 
             //--- check
             if (!masks || !symbol) 
-                return false;
+                return x::eNO_MATCHED;
 
             if(*symbol == 0 && *masks == 0)
-                return true;
+                return x::eMATCHED;
 
-            enum { eMAX_MASK_SIZE = 256 };
-            ch mask [eMAX_MASK_SIZE] = {};
+            ch mask [256];
             bool found = false;
-            int pos = 0;
 
             //--- look through groupmask
-            for (const ch* token = masks; *token; ++token)
+            for (const ch* token = masks; *token != 0; ++token)
             {
                 //--- skip spaces and commas
                 if (*token == ' ' || *token == ',') 
                     continue;
+
                 //--- copy mask
-                for (pos = 0; *token && *token != ',' && pos < 255; ++token, ++pos)
+                size_t pos = 0;
+                for (pos = 0; *token != 0 && *token != ',' && pos < 255; ++token, ++pos)
                     mask[pos] = *token;
         
                 //--- skip spaces and commas
@@ -150,22 +156,36 @@ namespace tools
                 mask[pos] = 0;
 
                 //--- check
-                const bool ok = detail_match_group::check_template(mask, symbol);
-
-                if (mask[0] == '+' && ok)
-                    return true;
-
-                else if (mask[0] == '!' && ok)
-                    return false;
-                else if(ok)
+                const ch* p = mask;
+                bool negative = false;
+                bool especial = false;
+                for (;;)
+                {
+                    if (*p == '+')
+                        especial = true;
+                    else if (*p == '!')
+                        negative = true;
+                    else
+                        break;
+                    ++p;
+                }
+                
+                const bool ok = x::check_template(p, symbol);
+                if (ok)
+                {
+                    if(negative)
+                        return x::eBANNED;
+                    if(especial)
+                        return x::eMATCHED;
                     found = true;
+                }
 
                 //--- template over
                 if (!*token)
                     break;
             }
             //--- return result
-            return found;
+            return found? x::eMATCHED: x::eNO_MATCHED;
         }
 
         #ifndef NDEBUG // debug
@@ -199,7 +219,10 @@ namespace tools
                 x::check_symbol(&symbol[0], len_symbol);
         #endif
 
-        return x::match_group(&symbol[0], &mask[0]);
+        const x::eRESULT result
+            = x::match_group(&symbol[0], &mask[0]);
+
+        return result == x::eMATCHED;
     }
 
     #if 0
