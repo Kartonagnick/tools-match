@@ -1,9 +1,10 @@
 
 // [2021y-02m-05d] Idrisov Denis R.
+// [2021y-02m-19d] Idrisov Denis R.
 #pragma once
 
 #ifndef dTOOLS_MATCH_GROUP_
-#define dTOOLS_MATCH_GROUP_ 100
+#define dTOOLS_MATCH_GROUP_ 111
 //==============================================================================
 //==============================================================================
 
@@ -15,9 +16,21 @@ namespace tools
     // assert( me::match_group(""      , ""    ));
     // assert(!me::match_group(""      , "mask"));
 
-    template<class str1, class str2>
-    dNODISCARD 
-    bool match_group(const str1& symbol, const str2& mask) dNOEXCEPT;
+    template<class s1, class s2>
+    dNODISCARD bool match_group(
+        const s1& symbol, 
+        const s2& mask
+    ) dNOEXCEPT;
+
+    // if banned(symbol1)  || banned(symbol2)) --> false
+    // if matched(symbol1) || matched(symbol2)) --> true
+
+    template<class s1, class s2, class s3>
+    dNODISCARD bool match_group(
+        const s1& symbol1, 
+        const s2& symbol2, 
+        const s3& mask
+    ) dNOEXCEPT;
 
 } // namespace tools
 
@@ -116,7 +129,7 @@ namespace tools
             return true;
         }
     
-        enum eRESULT { eMATCHED, eNO_MATCHED, eBANNED };
+        enum eRESULT { eMATCHED, eALLOWED, eNO_MATCHED, eBANNED };
 
         template<class ch>
         eRESULT match_group(const ch* symbol, const ch* masks) dNOEXCEPT
@@ -176,7 +189,7 @@ namespace tools
                     if(negative)
                         return x::eBANNED;
                     if(especial)
-                        return x::eMATCHED;
+                        return x::eALLOWED;
                     found = true;
                 }
 
@@ -192,11 +205,24 @@ namespace tools
         template<class ch> 
         void check_symbol(ch* symbol, const size_t len) dNOEXCEPT
         {
-            assert(symbol);
+            dASSERT(symbol);
             const ch* front = &symbol[0];
             const ch* back = front + len - 1;
-            assert(*front != ' ');
-            assert(*back  != ' ');
+            dASSERT(*front != ' ');
+            dASSERT(*back  != ' ');
+        }
+
+        template<class s1, class s2>
+        bool check(const s1& symbol, const s2& mask) dNOEXCEPT
+        {
+            namespace x = detail_match_group;
+            const size_t len_symbol = ::tools::strlength(symbol);
+            const size_t len_mask   = ::tools::strlength(mask);
+            dASSERT(len_symbol < 255);
+            dASSERT(len_mask   < 255);
+            if(len_symbol != 0)
+                x::check_symbol(&symbol[0], len_symbol);
+            return true;
         }
         #endif // !!NDEBUG
 
@@ -205,47 +231,45 @@ namespace tools
 //==============================================================================
 //==============================================================================
 
-    template<class str1, class str2>
-    dNODISCARD
-    bool match_group(const str1& symbol, const str2& mask) dNOEXCEPT
+    template<class s1, class s2>
+    dNODISCARD bool match_group(const s1& symbol, const s2& mask) dNOEXCEPT
     {
         namespace x = detail_match_group;
-        #ifndef NDEBUG // debug
-            const size_t len_symbol = ::tools::strlength(symbol);
-            const size_t len_mask   = ::tools::strlength(mask);
-            dASSERT(len_symbol < 255);
-            dASSERT(len_mask   < 255);
-            if(len_symbol != 0)
-                x::check_symbol(&symbol[0], len_symbol);
-        #endif
+        dASSERT(x::check(symbol, mask));
 
         const x::eRESULT result
             = x::match_group(&symbol[0], &mask[0]);
 
-        return result == x::eMATCHED;
+        return result < x::eNO_MATCHED;
     }
 
-    #if 0
-    // --- todo
-    template<class s1, class s2>
-    bool match_group(const s1& symbol, const s2& security, const str_t& mask) noexcept
+    template<class s1, class s2, class s3>
+    dNODISCARD bool 
+    match_group(const s1& symbol1, const s2& symbol2, const s3& mask) dNOEXCEPT
     {
-        if(tools::match_group(symbol, mask))
+        namespace x = detail_match_group;
+        dASSERT(x::check(symbol1, mask));
+
+        const x::eRESULT result
+            = x::match_group(&symbol1[0], &mask[0]);
+
+        if (result == x::eALLOWED)
+            return true;
+
+        if (result == x::eMATCHED)
         {
-            if(tools::match_group(security, mask + ", *"))
-                return true;
+            const x::eRESULT re1
+                = x::match_group(symbol2, mask);
+            return re1 != x::eBANNED;
         }
-        else
-        {
-            if(tools::match_group(security, mask))
-            {
-                if(tools::match_group(symbol, mask + ", *"))
-                    return true;
-            }
-        }
-        return false;
+
+        if (result == x::eBANNED)
+            return false;
+
+        const x::eRESULT re2 
+            = x::match_group(symbol2, mask);
+        return re2 < x::eNO_MATCHED;
     }
-    #endif
 
 } // namespace tools
 
