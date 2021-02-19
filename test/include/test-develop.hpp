@@ -21,6 +21,7 @@
     // #define TEST_CLASSIC                                 // ready!
 
 //===== tools/match ========== (pre11) (c++11) =============||==================
+    #define TEST_TOOLS_MATCH_GROUP_EXTRA                    // in progress...
     #define TEST_TOOLS_MATCH_GROUP_PLUS                     // ready!
     #define TEST_TOOLS_MATCH_GROUP                          // ready!
     // #define TEST_TOOLS_MATCH_OPTIMIZE_MASK               // ready!

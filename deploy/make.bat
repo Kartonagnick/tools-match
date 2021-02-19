@@ -14,10 +14,10 @@ rem ============================================================================
     set "order=%VC%"
     rem set "order=%MG%"
     rem set "order=%VC%; %MG%"
-    set "order=all"
+    rem set "order=all"
 
     rem for development
-    rem (call :generate) && (goto :success) || (goto :failed)
+    (call :generate) && (goto :success) || (goto :failed)
 
     rem (call :clean)    || (goto :failed)
     (call :build)    || (goto :failed)
