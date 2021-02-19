@@ -30,7 +30,7 @@ namespace tools
         const s1& symbol1, 
         const s2& symbol2, 
         const s3& mask
-    ) noexcept;
+    ) dNOEXCEPT;
 
 } // namespace tools
 
@@ -245,7 +245,7 @@ namespace tools
 
     template<class s1, class s2, class s3>
     dNODISCARD bool 
-    match_group(const s1& symbol1, const s2& symbol2, const s3& mask) noexcept
+    match_group(const s1& symbol1, const s2& symbol2, const s3& mask) dNOEXCEPT
     {
         namespace x = detail_match_group;
         dASSERT(x::check(symbol1, mask));
